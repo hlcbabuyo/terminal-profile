@@ -13,77 +13,89 @@ except Exception:
     repos = "N/A"
     followers = "N/A"
 
-# Format variables to align perfectly
-repos_str = str(repos).ljust(4)
-followers_str = str(followers).ljust(4)
-
-# 2. Build the SVG (Scalable Vector Graphic)
-svg_content = f"""<svg width="850" height="460" viewBox="0 0 850 460" xmlns="http://www.w3.org/2000/svg">
+# 2. Build the Animated Windows Terminal SVG
+svg_content = f"""<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .bg {{ fill: #0D1117; }}
-    .text {{ font-family: 'Courier New', Consolas, monospace; font-size: 15px; }}
-    .title {{ font-weight: bold; fill: #E6EDF3; }}
-    .green {{ fill: #39D353; }}
-    .blue {{ fill: #58A6FF; }}
-    .yellow {{ fill: #D2A8FF; }}
-    .cyan {{ fill: #388BFD; }}
-    .purple {{ fill: #BC8CFF; }}
-    .red {{ fill: #FF7B72; }}
-    .white {{ fill: #C9D1D9; }}
-    .gray {{ fill: #8B949E; }}
-    .accent {{ fill: #F2CC60; }}
+    .bg {{ fill: #0C0C0C; }}
+    .bar {{ fill: #1E1E1E; }}
+    .text {{ font-family: Consolas, 'Courier New', monospace; font-size: 15px; fill: #CCCCCC; }}
+    .prompt {{ fill: #E06C75; }}
+    .cyan {{ fill: #56B6C2; }}
+    .green {{ fill: #98C379; }}
+    .orange {{ fill: #D19A66; }}
+    .blue {{ fill: #61AFEF; }}
     
-    /* The CSS Blinking Cursor Animation! */
-    .blink {{ animation: blinker 1s linear infinite; }}
+    /* CSS Animation for the Blinking Cursor */
+    .blink {{ animation: blinker 1s step-end infinite; }}
     @keyframes blinker {{ 50% {{ opacity: 0; }} }}
+
+    /* CSS Animation to make the terminal "type" */
+    .type {{ opacity: 0; animation: appear 0.1s forwards; }}
+    @keyframes appear {{ to {{ opacity: 1; }} }}
+    
+    /* Timing for each line appearing */
+    .d1 {{ animation-delay: 0.5s; }}
+    .d2 {{ animation-delay: 1.2s; }}
+    .d3 {{ animation-delay: 2.0s; }}
+    .d4 {{ animation-delay: 2.5s; }}
+    .d5 {{ animation-delay: 4.0s; }}
+    .d6 {{ animation-delay: 4.5s; }}
+    .d7 {{ animation-delay: 5.5s; }}
   </style>
 
-  <!-- Terminal Window Background -->
-  <rect width="100%" height="100%" rx="10" ry="10" class="bg" stroke="#30363D" stroke-width="2"/>
+  <!-- Windows Terminal Background -->
+  <rect width="100%" height="100%" class="bg" stroke="#333333" stroke-width="1"/>
+  
+  <!-- Windows Title Bar -->
+  <rect width="100%" height="30" class="bar"/>
+  <text x="15" y="20" font-family="Segoe UI, sans-serif" font-size="12" fill="#AAAAAA">Command Prompt - stats.py</text>
+  
+  <!-- Windows Control Buttons (Minimize, Maximize, Close) -->
+  <path d="M 705 15 L 715 15" stroke="#AAAAAA" stroke-width="1"/>
+  <rect x="740" y="10" width="10" height="10" fill="none" stroke="#AAAAAA" stroke-width="1"/>
+  <path d="M 775 10 L 785 20 M 785 10 L 775 20" stroke="#AAAAAA" stroke-width="1"/>
 
-  <!-- macOS Window Buttons -->
-  <circle cx="20" cy="20" r="6" fill="#FF5F56"/>
-  <circle cx="40" cy="20" r="6" fill="#FFBD2E"/>
-  <circle cx="60" cy="20" r="6" fill="#27C93F"/>
+  <!-- Terminal Content -->
+  <g transform="translate(20, 60)">
+    <!-- Boot Sequence -->
+    <text x="0" y="0" class="text type d1">Initializing terminal...</text>
+    <text x="0" y="20" class="text type d2"><tspan class="green">[OK]</tspan> System ready</text>
 
-  <!-- Terminal Title -->
-  <text x="425" y="24" class="text gray" text-anchor="middle" font-size="13px">hlcbabuyo — bash</text>
+    <!-- Command 1: GitHub Stats -->
+    <text x="0" y="60" class="text type d3"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; github-stats --user hlcbabuyo</text>
+    
+    <g class="type d4">
+        <text x="0" y="100" class="text cyan">=== GitHub Stats for hlcbabuyo ===</text>
+        <text x="0" y="120" class="text"><tspan class="orange">Name:</tspan>        Harvie Lorenz C. Babuyo</text>
+        <text x="0" y="140" class="text"><tspan class="orange">Role:</tspan>        Backend Systems Engineer</text>
+        <text x="0" y="160" class="text"><tspan class="orange">Location:</tspan>    Tagoloan, Philippines</text>
+        <text x="0" y="180" class="text"><tspan class="orange">Goal:</tspan>        240-Hour OJT (June 2026)</text>
+        <text x="0" y="200" class="text"><tspan class="orange">Repos:</tspan>       {repos}</text>
+        <text x="0" y="220" class="text"><tspan class="orange">Followers:</tspan>   {followers}</text>
+        <text x="0" y="240" class="text cyan">==================================</text>
+    </g>
 
-  <g transform="translate(30, 70)">
-    <!-- ASCII Computer on the Left -->
-    <text x="0" y="0" class="text cyan" xml:space="preserve">.-------------------------------.</text>
-    <text x="0" y="20" class="text cyan" xml:space="preserve">|  <tspan class="green">&gt;_ hlcbabuyo@server</tspan>          |</text>
-    <text x="0" y="40" class="text cyan" xml:space="preserve">|                               |</text>
-    <text x="0" y="60" class="text cyan" xml:space="preserve">|  <tspan class="accent">Repos:</tspan>     <tspan class="white">{repos_str}</tspan>             |</text>
-    <text x="0" y="80" class="text cyan" xml:space="preserve">|  <tspan class="purple">Followers:</tspan> <tspan class="white">{followers_str}</tspan>             |</text>
-    <text x="0" y="100" class="text cyan" xml:space="preserve">|                               |</text>
-    <text x="0" y="120" class="text cyan" xml:space="preserve">'-------------------------------'</text>
-    <text x="0" y="140" class="text cyan" xml:space="preserve">     _[___________________]_</text>
-    <text x="0" y="160" class="text cyan" xml:space="preserve">     \                     /</text>
-    <text x="0" y="180" class="text cyan" xml:space="preserve">      \___________________/</text>
+    <!-- Command 2: Tech Stack -->
+    <text x="0" y="280" class="text type d5"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; cat skills.txt</text>
+    
+    <g class="type d6">
+        <text x="0" y="320" class="text cyan">=== Tech Stack ===</text>
+        <text x="0" y="340" class="text"><tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic</text>
+        <text x="0" y="360" class="text"><tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis</text>
+        <text x="0" y="380" class="text"><tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM)</text>
+        <text x="0" y="400" class="text"><tspan class="blue">DevOps:</tspan>      Docker, Git, GitHub Actions</text>
+        <text x="0" y="420" class="text"><tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup</text>
+        <text x="0" y="440" class="text"><tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman</text>
+        <text x="0" y="460" class="text"><tspan class="blue">Languages:</tspan>   Python, SQL</text>
+        <text x="0" y="480" class="text cyan">==================</text>
+    </g>
 
-    <!-- Identity Section on the Right -->
-    <text x="360" y="0" class="text title" xml:space="preserve">=== Harvie Lorenz C. Babuyo ===</text>
-    <text x="360" y="25" class="text gray" xml:space="preserve">Role:      <tspan class="white">Backend Systems Engineer</tspan></text>
-    <text x="360" y="45" class="text gray" xml:space="preserve">Location:  <tspan class="white">Tagoloan, Philippines</tspan></text>
-    <text x="360" y="65" class="text gray" xml:space="preserve">Goal:      <tspan class="white">240-Hour OJT (June 2026)</tspan></text>
-
-    <!-- Tech Stack Section on the Right -->
-    <text x="360" y="110" class="text title" xml:space="preserve">=== Tech Stack ===</text>
-    <text x="360" y="135" class="text gray" xml:space="preserve">Backend:     <tspan class="green">Python, FastAPI, SQLAlchemy, Pydantic</tspan></text>
-    <text x="360" y="155" class="text gray" xml:space="preserve">Database:    <tspan class="purple">PostgreSQL, PostGIS, Redis</tspan></text>
-    <text x="360" y="175" class="text gray" xml:space="preserve">Cloud:       <tspan class="accent">AWS (S3, EC2, RDS, IAM)</tspan></text>
-    <text x="360" y="195" class="text gray" xml:space="preserve">DevOps:      <tspan class="red">Docker, Git, GitHub Actions</tspan></text>
-    <text x="360" y="215" class="text gray" xml:space="preserve">Processing:  <tspan class="cyan">Celery, BeautifulSoup</tspan></text>
-    <text x="360" y="235" class="text gray" xml:space="preserve">Tools:       <tspan class="blue">ReportLab, QRCode, boto3, Postman</tspan></text>
-    <text x="360" y="255" class="text gray" xml:space="preserve">Languages:   <tspan class="accent">Python, SQL</tspan></text>
-
-    <!-- Bottom Command with Blinking Cursor -->
-    <text x="0" y="340" class="text green" xml:space="preserve">&gt;_ System ready. Type 'help' for commands. <tspan class="white blink">█</tspan></text>
+    <!-- Final Prompt with Blinking Cursor -->
+    <text x="0" y="520" class="text type d7"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; <tspan class="blink">█</tspan></text>
   </g>
 </svg>"""
 
 with open("terminal.svg", "w", encoding="utf-8") as file:
     file.write(svg_content)
 
-print("Pixel-perfect SVG generated successfully!")
+print("Windows-style animated SVG generated successfully!")
