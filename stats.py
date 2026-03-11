@@ -1,128 +1,147 @@
-import urllib.request
-import json
+import gifos
+from datetime import datetime
+import os
+import requests
 
-# 1. Fetch live GitHub stats
+# ============================================
+# Terminal GIF with GitHub Stats
+# ============================================
+# 
+# REQUIREMENTS:
+# 1. Create a .env file in the project folder
+# 2. Add: GITHUB_TOKEN=your_token_here
+#
+# To create the token:
+# - Go to: https://github.com/settings/tokens
+# - Click "Generate new token (classic)"
+# - Select only: read:user
+# - Copy the token and add it to .env
+# ============================================
+
+USERNAME = "hlcbabuyo"  # <- Your GitHub username
+
+# Function to fetch real number of repos
+def get_total_repos(username):
+    try:
+        response = requests.get(f"https://api.github.com/users/{username}")
+        if response.status_code == 200:
+            return response.json().get("public_repos", 0)
+    except:
+        pass
+    return None
+
+# Try to fetch GitHub statistics
 try:
-    url = "https://api.github.com/users/hlcbabuyo"
-    req = urllib.request.Request(url)
-    with urllib.request.urlopen(req) as response:
-        data = json.loads(response.read().decode())
-        repos = data.get('public_repos', 0)
-        followers = data.get('followers', 0)
-except Exception:
-    repos = "N/A"
-    followers = "N/A"
+    github_stats = gifos.utils.fetch_github_stats(user_name=USERNAME)
+    has_stats = github_stats is not None
+    if not has_stats:
+        print("Warning: Could not fetch GitHub stats")
+        print("Configure GITHUB_TOKEN in .env file")
+except Exception as e:
+    print(f"Warning: Error fetching GitHub stats: {e}")
+    print("Using example data...")
+    has_stats = False
+    github_stats = None
 
-# 2. Timing & Animation Engine (20-second infinite loop)
-current_pct = 0.02
-dur = "20s"
+# Fetch real number of repos
+total_repos = get_total_repos(USERNAME)
 
-def get_anim(delay=0.03):
-    """Handles the line-by-line pop-up effect."""
-    global current_pct
-    start = round(current_pct, 3)
-    current_pct += delay
-    return f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{start};{start+0.001};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
+# Terminal settings (Widened to 850 so your skills fit perfectly)
+t = gifos.Terminal(width=850, height=450, xpad=10, ypad=10)
 
-def get_typing_anim(cmd_length, delay_after=0.03, type_time=0.06):
-    """Calculates the sliding 'cover rect' to create a character-by-character typing effect."""
-    global current_pct
-    start = round(current_pct, 3)
-    end_type = round(start + type_time, 3)
-    current_pct = end_type + delay_after
-    
-    # Math to calculate how far the cursor should move based on string length
-    start_x = 185
-    end_x = start_x + (cmd_length * 8.4)
-    
-    # 1. Shows the text and the cover rect
-    t_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{start};{start+0.001};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
-    # 2. Slides the cover rect to the right to reveal the text
-    c_anim = f'<animate attributeName="x" values="{start_x};{start_x};{end_x};{end_x};{start_x};{start_x}" keyTimes="0;{start};{end_type};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
-    # 3. Moves the "█" cursor along with the cover rect
-    cx_anim = f'<animate attributeName="x" values="{start_x};{start_x};{end_x};{end_x};{start_x};{start_x}" keyTimes="0;{start};{end_type};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
-    # 4. Hides the moving cursor when typing finishes
-    co_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{start};{start+0.001};{end_type};{end_type+0.001};1" dur="{dur}" repeatCount="indefinite" />'
-    
-    return t_anim, c_anim, cx_anim, co_anim
+# -- Initial prompt --
+t.set_prompt(f"\x1b[91m{USERNAME}\x1b[0m@\x1b[93mgithub\x1b[0m ~> ")
 
-# --- Generating the Commands with Typing Effects ---
+# -- Boot sequence --
+t.gen_text("Initializing terminal...", row_num=1)
+t.clone_frame(5)
+t.gen_text("\x1b[32m[OK]\x1b[0m System ready", row_num=2)
+t.clone_frame(10)
 
-t1, c1, cx1, co1 = get_typing_anim(len("github-stats --user hlcbabuyo"))
-cmd1 = f'''<text x="0" y="60" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; github-stats --user hlcbabuyo{t1}</text>
-<rect x="185" y="45" width="450" height="20" class="bg" opacity="0">{t1}{c1}</rect>
-<text x="185" y="60" class="text" opacity="0">█{cx1}{co1}</text>'''
+# -- Command to view stats --
+t.gen_prompt(row_num=3)
+t.gen_typing_text("github-stats --user " + USERNAME, row_num=3, contin=True, speed=1)
+t.clone_frame(5)
 
-t2, c2, cx2, co2 = get_typing_anim(len("cat skills.txt"))
-cmd2 = f'''<text x="0" y="280" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; cat skills.txt{t2}</text>
-<rect x="185" y="265" width="450" height="20" class="bg" opacity="0">{t2}{c2}</rect>
-<text x="185" y="280" class="text" opacity="0">█{cx2}{co2}</text>'''
+# -- Display statistics --
+t.gen_text("", row_num=4)
+t.gen_text(f"\x1b[96m=== GitHub Stats for {USERNAME} ===\x1b[0m", row_num=5)
+t.clone_frame(3)
 
-t3, c3, cx3, co3 = get_typing_anim(len("echo 'Thanks for visiting my profile!'"))
-cmd3 = f'''<text x="0" y="520" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; echo 'Thanks for visiting my profile!'{t3}</text>
-<rect x="185" y="505" width="450" height="20" class="bg" opacity="0">{t3}{c3}</rect>
-<text x="185" y="520" class="text" opacity="0">█{cx3}{co3}</text>'''
+if has_stats:
+    repos_count = total_repos if total_repos else github_stats.total_repo_contributions
+    stats_lines = [
+        f"\x1b[93mName:\x1b[0m        Harvie Lorenz C. Babuyo",
+        f"\x1b[93mRole:\x1b[0m        Backend Systems Engineer",
+        f"\x1b[93mLocation:\x1b[0m    Tagoloan, Misamis Oriental, Philippines",
+        f"\x1b[93mGoal:\x1b[0m        240-Hour OJT (June 2026)",
+        f"\x1b[93mRepos:\x1b[0m       {repos_count}",
+        f"\x1b[93mFollowers:\x1b[0m   {github_stats.total_followers}",
+    ]
+else:
+    # Example data fallback
+    stats_lines = [
+        f"\x1b[93mName:\x1b[0m        Harvie Lorenz C. Babuyo",
+        f"\x1b[93mRole:\x1b[0m        Backend Systems Engineer",
+        f"\x1b[93mLocation:\x1b[0m    Tagoloan, Misamis Oriental, Philippines",
+        f"\x1b[93mGoal:\x1b[0m        240-Hour OJT (June 2026)",
+        "\x1b[93mRepos:\x1b[0m       --",
+        "\x1b[93mFollowers:\x1b[0m   --",
+    ]
 
+# Print stats line by line
+for i, line in enumerate(stats_lines):
+    t.gen_text(line, row_num=6+i)
+    t.clone_frame(3)
 
-# 3. Assemble the final SVG
-svg_content = f"""<svg width="800" height="620" viewBox="0 0 800 620" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .bg {{ fill: #0A0A0A; }}
-    .text {{ font-family: Consolas, 'Courier New', monospace; font-size: 15px; fill: #CCCCCC; }}
-    .prompt {{ fill: #E06C75; }}
-    .cyan {{ fill: #56B6C2; }}
-    .green {{ fill: #98C379; }}
-    .orange {{ fill: #D19A66; }}
-    .blue {{ fill: #61AFEF; }}
-    .blink {{ animation: blinker 1s step-end infinite; }}
-    @keyframes blinker {{ 50% {{ opacity: 0; }} }}
-  </style>
+t.clone_frame(10)
+t.gen_text("\x1b[96m================================\x1b[0m", row_num=6+len(stats_lines))
+t.clone_frame(15)
 
-  <rect width="100%" height="100%" class="bg"/>
+# -- Clear the screen --
+t.gen_prompt(row_num=7+len(stats_lines))
+t.gen_typing_text("clear", row_num=7+len(stats_lines), contin=True, speed=1)
+t.clone_frame(5)
+t.clear_frame()
 
-  <g transform="translate(20, 30)">
-    
-    <!-- Boot Sequence -->
-    <text x="0" y="0" class="text" opacity="0">Initializing terminal...{get_anim(0.04)}</text>
-    <text x="0" y="20" class="text" opacity="0"><tspan class="green">[OK]</tspan> System ready{get_anim(0.06)}</text>
+# -- Command to view skills --
+t.gen_prompt(row_num=1)
+t.gen_typing_text("cat skills.txt", row_num=1, contin=True, speed=1)
+t.clone_frame(5)
 
-    <!-- Command 1: GitHub Stats -->
-    {cmd1}
-    <text x="0" y="100" class="text cyan" opacity="0">=== GitHub Stats for hlcbabuyo ==={get_anim(0.02)}</text>
-    <text x="0" y="120" class="text" opacity="0"><tspan class="orange">Name:</tspan>        Harvie Lorenz C. Babuyo{get_anim(0.02)}</text>
-    <text x="0" y="140" class="text" opacity="0"><tspan class="orange">Role:</tspan>        Backend Systems Engineer{get_anim(0.02)}</text>
-    <text x="0" y="160" class="text" opacity="0"><tspan class="orange">Location:</tspan>    Tagoloan, Misamis Oriental, Philippines{get_anim(0.02)}</text>
-    <text x="0" y="180" class="text" opacity="0"><tspan class="orange">Goal:</tspan>        240-Hour OJT (June 2026){get_anim(0.02)}</text>
-    <text x="0" y="200" class="text" opacity="0"><tspan class="orange">Repos:</tspan>       {repos}{get_anim(0.02)}</text>
-    <text x="0" y="220" class="text" opacity="0"><tspan class="orange">Followers:</tspan>   {followers}{get_anim(0.02)}</text>
-    <text x="0" y="240" class="text cyan" opacity="0">=================================={get_anim(0.06)}</text>
+t.gen_text("", row_num=2)
+t.gen_text("\x1b[96m=== Tech Stack ===\x1b[0m", row_num=3)
+t.clone_frame(3)
 
-    <!-- Command 2: Tech Stack -->
-    {cmd2}
-    <text x="0" y="320" class="text cyan" opacity="0">=== Tech Stack ==={get_anim(0.02)}</text>
-    <text x="0" y="340" class="text" opacity="0"><tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic{get_anim(0.02)}</text>
-    <text x="0" y="360" class="text" opacity="0"><tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis{get_anim(0.02)}</text>
-    <text x="0" y="380" class="text" opacity="0"><tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM){get_anim(0.02)}</text>
-    <text x="0" y="400" class="text" opacity="0"><tspan class="blue">DevOps:</tspan>      Docker, Git, GitHub Actions{get_anim(0.02)}</text>
-    <text x="0" y="420" class="text" opacity="0"><tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup{get_anim(0.02)}</text>
-    <text x="0" y="440" class="text" opacity="0"><tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman{get_anim(0.02)}</text>
-    <text x="0" y="460" class="text" opacity="0"><tspan class="blue">Languages:</tspan>   Python, SQL{get_anim(0.02)}</text>
-    <text x="0" y="480" class="text cyan" opacity="0">=================={get_anim(0.06)}</text>
+# Your specific Tech Stack
+skills = [
+    ("\x1b[94mBackend:\x1b[0m     ", "Python, FastAPI, SQLAlchemy, Pydantic"),
+    ("\x1b[94mDatabase:\x1b[0m    ", "PostgreSQL, PostGIS, Redis"),
+    ("\x1b[94mCloud:\x1b[0m       ", "AWS (S3, EC2, RDS, IAM)"),
+    ("\x1b[94mDevOps:\x1b[0m      ", "Docker, Git, GitHub Actions"),
+    ("\x1b[94mProcessing:\x1b[0m  ", "Celery, BeautifulSoup"),
+    ("\x1b[94mTools:\x1b[0m       ", "ReportLab, QRCode, boto3, Postman"),
+    ("\x1b[94mLanguages:\x1b[0m   ", "Python, SQL"),
+]
 
-    <!-- Command 3: The Outro -->
-    {cmd3}
-    <text x="0" y="540" class="text green" opacity="0">Thanks for visiting my profile!{get_anim(0.06)}</text>
+# Print skills line by line
+for i, (label, value) in enumerate(skills):
+    t.gen_text(f"{label}{value}", row_num=4+i)
+    t.clone_frame(2)
 
-    <!-- Final Prompt with Blinking Cursor -->
-    <g opacity="0">
-        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{current_pct};{current_pct+0.001};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />
-        <text x="0" y="580" class="text"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; <tspan class="blink">█</tspan></text>
-    </g>
-    
-  </g>
-</svg>"""
+t.clone_frame(10)
+t.gen_text("\x1b[96m==================\x1b[0m", row_num=4+len(skills))
+t.clone_frame(5)
 
-with open("terminal.svg", "w", encoding="utf-8") as file:
-    file.write(svg_content)
+# -- Final message --
+final_row = 5 + len(skills)
+t.gen_prompt(row_num=final_row)
+t.gen_typing_text("echo 'Thanks for visiting my profile!'", row_num=final_row, contin=True, speed=1)
+t.clone_frame(5)
+t.gen_text("\x1b[92mThanks for visiting my profile!\x1b[0m", row_num=final_row+1)
+t.clone_frame(40)
 
-print("Masterpiece SVG generated successfully!")
+# Generate the GIF
+t.gen_gif()
+
+print("\n GIF generated: output.gif")
