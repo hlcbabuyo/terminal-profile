@@ -24,7 +24,7 @@ def get_anim(delay=0.03):
     return f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{start};{start+0.001};0.95;0.951;1" dur="20s" repeatCount="indefinite" />'
 
 # 3. Build the Animated SVG
-svg_content = f"""<svg width="800" height="620" viewBox="0 0 800 620" xmlns="http://www.w3.org/2000/svg">
+svg_content = f"""<svg width="100%" height="620" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
   <style>
     .bg {{ fill: #0A0A0A; }}
     .text {{ font-family: Consolas, 'Courier New', monospace; font-size: 15px; fill: #CCCCCC; }}
