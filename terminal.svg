@@ -27,7 +27,7 @@
     <text x="0" y="140" class="text" opacity="0"><tspan class="orange">Role:</tspan>        Backend Systems Engineer<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.22;0.221;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
     <text x="0" y="160" class="text" opacity="0"><tspan class="orange">Location:</tspan>    Tagoloan, Misamis Oriental, Philippines<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.25;0.251;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
     <text x="0" y="180" class="text" opacity="0"><tspan class="orange">Goal:</tspan>        240-Hour OJT (June 2026)<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.28;0.281;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="200" class="text" opacity="0"><tspan class="orange">Repos:</tspan>       5<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.31;0.311;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
+    <text x="0" y="200" class="text" opacity="0"><tspan class="orange">Repos:</tspan>       4<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.31;0.311;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
     <text x="0" y="220" class="text" opacity="0"><tspan class="orange">Followers:</tspan>   11<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.34;0.341;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
     <text x="0" y="240" class="text cyan" opacity="0">==================================<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.37;0.371;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
 
