@@ -1,0 +1,34 @@
+name: Generate Terminal Profile
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Auto-runs at midnight
+  workflow_dispatch: # Allows manual run
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install VHS
+        uses: charmbracelet/vhs-action@v2
+        with:
+          path: 'profile.tape'
+
+      - name: Commit and Push GIF
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add terminal.gif
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update terminal animation"
+          git push
