@@ -20,15 +20,21 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install VHS
-        uses: charmbracelet/vhs-action@v2
-        with:
-          path: 'profile.tape'
+      - name: Install System Dependencies (Bypassing VHS Action)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg ttyd fonts-firacode
+          
+      - name: Install VHS directly via Go
+        run: go install github.com/charmbracelet/vhs@latest
+
+      - name: Generate Terminal GIF
+        run: ~/go/bin/vhs profile.tape
 
       - name: Commit and Push GIF
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
           git add terminal.gif
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update terminal animation"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update terminal animation [skip ci]"
           git push
