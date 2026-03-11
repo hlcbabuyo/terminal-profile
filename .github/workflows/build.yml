@@ -22,8 +22,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          # We install gifos directly from GitHub since it is not on PyPI
-          pip install git+https://github.com/dbuzatto/gifos.git
+          pip install git+https://github.com/hlcbabuyo/gifos.git
           pip install requests python-dotenv
 
       - name: Generate Terminal GIF
@@ -38,6 +37,5 @@ jobs:
           git add output.gif
           # Only commit if the GIF has actually changed
           git diff --quiet && git diff --staged --quiet || git commit -m "Update terminal GIF [skip ci]"
-          # Always pull latest changes before pushing to avoid the traffic jam error
           git pull --rebase origin main
           git push
