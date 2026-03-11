@@ -45,28 +45,28 @@ svg_content = f"""<svg width="100%" height="620" viewBox="0 0 1200 620" preserve
     <text x="0" y="100" class="text cyan" opacity="0">=== GitHub Stats for hlcbabuyo ==={get_anim()}</text>
     <text x="0" y="120" class="text" opacity="0"><tspan class="orange">Name:</tspan>        Harvie Lorenz C. Babuyo{get_anim()}</text>
     <text x="0" y="140" class="text" opacity="0"><tspan class="orange">Role:</tspan>        Backend Systems Engineer{get_anim()}</text>
-    <text x="0" y="160" class="text opacity="0"><tspan class="orange">Location:</tspan>    Tagoloan, Misamis Oriental, Philippines{get_anim()}</text>
-    <text x="0" y="180" class="text opacity="0"><tspan class="orange">Goal:</tspan>        240-Hour OJT (June 2026){get_anim()}</text>
-    <text x="0" y="200" class="text opacity="0"><tspan class="orange">Repos:</tspan>       {repos}{get_anim()}</text>
-    <text x="0" y="220" class="text opacity="0"><tspan class="orange">Followers:</tspan>   {followers}{get_anim()}</text>
+    <text x="0" y="160" class="text" opacity="0"><tspan class="orange">Location:</tspan>    Tagoloan, Misamis Oriental, Philippines{get_anim()}</text>
+    <text x="0" y="180" class="text" opacity="0"><tspan class="orange">Goal:</tspan>        240-Hour OJT (June 2026){get_anim()}</text>
+    <text x="0" y="200" class="text" opacity="0"><tspan class="orange">Repos:</tspan>       {repos}{get_anim()}</text>
+    <text x="0" y="220" class="text" opacity="0"><tspan class="orange">Followers:</tspan>   {followers}{get_anim()}</text>
     <text x="0" y="240" class="text cyan" opacity="0">=================================={get_anim(0.06)}</text>
 
-    <text x="0" y="280" class="text opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; cat skills.txt{get_anim(0.04)}</text>
+    <text x="0" y="280" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; cat skills.txt{get_anim(0.04)}</text>
     
     <text x="0" y="320" class="text cyan" opacity="0">=== Tech Stack ==={get_anim()}</text>
-    <text x="0" y="340" class="text opacity="0"><tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic{get_anim()}</text>
-    <text x="0" y="360" class="text opacity="0"><tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis{get_anim()}</text>
-    <text x="0" y="380" class="text opacity="0"><tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM){get_anim()}</text>
-    <text x="0" y="400" class="text opacity="0"><tspan class="blue">DevOps:</tspan>      Docker, Git, GitHub Actions{get_anim()}</text>
-    <text x="0" y="420" class="text opacity="0"><tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup{get_anim()}</text>
-    <text x="0" y="440" class="text opacity="0"><tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman{get_anim()}</text>
-    <text x="0" y="460" class="text opacity="0"><tspan class="blue">Languages:</tspan>   Python, SQL{get_anim()}</text>
+    <text x="0" y="340" class="text" opacity="0"><tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic{get_anim()}</text>
+    <text x="0" y="360" class="text" opacity="0"><tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis{get_anim()}</text>
+    <text x="0" y="380" class="text" opacity="0"><tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM){get_anim()}</text>
+    <text x="0" y="400" class="text" opacity="0"><tspan class="blue">DevOps:</tspan>      Docker, Git, GitHub Actions{get_anim()}</text>
+    <text x="0" y="420" class="text" opacity="0"><tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup{get_anim()}</text>
+    <text x="0" y="440" class="text" opacity="0"><tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman{get_anim()}</text>
+    <text x="0" y="460" class="text" opacity="0"><tspan class="blue">Languages:</tspan>   Python, SQL{get_anim()}</text>
     <text x="0" y="480" class="text cyan" opacity="0">=================={get_anim(0.06)}</text>
 
-    <text x="0" y="520" class="text opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; echo 'Thanks for visiting my profile!'{get_anim(0.04)}</text>
+    <text x="0" y="520" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; echo 'Thanks for visiting my profile!'{get_anim(0.04)}</text>
     <text x="0" y="540" class="text green" opacity="0">Thanks for visiting my profile!{get_anim(0.06)}</text>
 
-    <text x="0" y="580" class="text opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; <tspan fill="#CCCCCC"><animate attributeName="opacity" values="1;0" keyTimes="0;0.5" dur="1s" repeatCount="indefinite" />█</tspan>{get_anim(0)}</text>
+    <text x="0" y="580" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; <tspan fill="#CCCCCC"><animate attributeName="opacity" values="1;0" keyTimes="0;0.5" dur="1s" repeatCount="indefinite" />█</tspan>{get_anim(0)}</text>
   </g>
 
   <g transform="translate(880, 310)">
