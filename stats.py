@@ -1,218 +1,152 @@
 import urllib.request
 import json
 
-# 1. Fetch live GitHub stats
-try:
-    url = "https://api.github.com/users/hlcbabuyo"
-    req = urllib.request.Request(url)
-    with urllib.request.urlopen(req) as response:
-        data = json.loads(response.read().decode())
-        repos = data.get('public_repos', 0)
-        followers = data.get('followers', 0)
-except Exception:
-    repos = "N/A"
-    followers = "N/A"
+def fetch_github_stats(username):
+    try:
+        url = f"https://api.github.com/users/{username}"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            return {
+                'repos': data.get('public_repos', 'N/A'),
+                'followers': data.get('followers', 'N/A'),
+            }
+    except Exception as e:
+        print(f"Could not fetch GitHub stats: {e}")
+        return {'repos': 'N/A', 'followers': 'N/A'}
 
-# 2. Timing system
-LOOP = 20.0
-FADE_OUT = 19.0
+DUR = "32s"
 
-def pct(t):
-    return round(t / LOOP, 4)
+def char_by_char(cmd_text, start_pct, char_delay=0.002):
+    spans = []
+    t = start_pct
+    for ch in cmd_text:
+        safe = ch.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        anim = (f'<animate attributeName="opacity" values="0;0;1;1;0;0" '
+                f'keyTimes="0;{round(t,4)};{round(t+0.0001,4)};0.95;0.951;1" '
+                f'dur="{DUR}" repeatCount="indefinite"/>')
+        spans.append(f'<tspan opacity="0">{safe}{anim}</tspan>')
+        t += char_delay
+    return spans, round(t, 4)
 
-def type_dur(text, cps=55):
-    return max(0.3, len(text) / cps)
+def cmd_line(y, cmd_text, start_pct, char_delay=0.002):
+    spans, end_pct = char_by_char(cmd_text, start_pct, char_delay)
+    prompt_anim = (f'<animate attributeName="opacity" values="0;0;1;1;0;0" '
+                   f'keyTimes="0;{round(start_pct,4)};{round(start_pct+0.0001,4)};0.95;0.951;1" '
+                   f'dur="{DUR}" repeatCount="indefinite"/>')
+    svg = (f'    <text x="0" y="{y}" class="text" opacity="0">'
+           f'<tspan class="prompt">hlcbabuyo@github ~&gt;</tspan>'
+           f'{"".join(spans)}'
+           f'{prompt_anim}</text>')
+    return svg, end_pct
 
-# 3. Line builder with typing effect (clipPath reveal)
-uid_counter = [0]
-defs_list = []
-elements_list = []
+def line_svg(content, start_pct):
+    s = round(start_pct, 4)
+    anim = (f'<animate attributeName="opacity" values="0;0;1;1;0;0" '
+            f'keyTimes="0;{s};{round(s+0.001,4)};0.95;0.951;1" '
+            f'dur="{DUR}" repeatCount="indefinite"/>')
+    return f'{content}{anim}', round(s + 0.02, 4)
 
-def add_line(x, y, parts, t_start, cps=70, glow=False):
-    """
-    parts = list of (text, color_hex_or_css_class)
-    Returns t_end so you can chain calls.
-    """
-    full_text = "".join(p[0] for p in parts)
-    dur = type_dur(full_text, cps)
-    t_end = t_start + dur
+def generate(username="hlcbabuyo", output="terminal.svg"):
+    stats = fetch_github_stats(username)
+    repos = stats['repos']
+    followers = stats['followers']
 
-    uid_counter[0] += 1
-    uid = uid_counter[0]
-    clip_id = f"c{uid}"
+    t = 0.02
+    boot1_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{t};{t+0.001};0.95;0.951;1" dur="{DUR}" repeatCount="indefinite"/>'
+    t = 0.05
+    boot2_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{t};{t+0.001};0.95;0.951;1" dur="{DUR}" repeatCount="indefinite"/>'
+    t = 0.09
 
-    p0     = pct(0)
-    p_s    = pct(t_start)
-    p_e    = pct(t_end)
-    p_fo   = pct(FADE_OUT)
-    p1     = pct(LOOP)
+    cmd1_svg, t = cmd_line(60,  " github-stats --user hlcbabuyo",           t, 0.002)
+    t += 0.015
+    s0, t = line_svg('<tspan class="cyan">=== GitHub Stats for hlcbabuyo ===</tspan>', t)
+    s1, t = line_svg(f'<tspan class="orange">Name:</tspan>        Harvie Lorenz C. Babuyo', t)
+    s2, t = line_svg(f'<tspan class="orange">Role:</tspan>        Backend Systems Engineer', t)
+    s3, t = line_svg(f'<tspan class="orange">Location:</tspan>    Tagoloan, Misamis Oriental, Philippines', t)
+    s4, t = line_svg(f'<tspan class="orange">Goal:</tspan>        240-Hour OJT (June 2026)', t)
+    s5, t = line_svg(f'<tspan class="orange">Repos:</tspan>       {repos}', t)
+    s6, t = line_svg(f'<tspan class="orange">Followers:</tspan>   {followers}', t)
+    s7, t = line_svg('<tspan class="cyan">==================================</tspan>', t)
+    t += 0.025
 
-    char_w = 8.6
-    full_w = len(full_text) * char_w + 20
+    cmd2_svg, t = cmd_line(280, " cat skills.txt",                           t, 0.002)
+    t += 0.015
+    k0, t = line_svg('<tspan class="cyan">=== Tech Stack ===</tspan>', t)
+    k1, t = line_svg('<tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic', t)
+    k2, t = line_svg('<tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis', t)
+    k3, t = line_svg('<tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM)', t)
+    k4, t = line_svg('<tspan class="blue">DevOps:</tspan>      Docker, Git, GitHub Actions', t)
+    k5, t = line_svg('<tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup', t)
+    k6, t = line_svg('<tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman', t)
+    k7, t = line_svg('<tspan class="blue">Languages:</tspan>   Python, SQL', t)
+    k8, t = line_svg('<tspan class="cyan">==================</tspan>', t)
+    t += 0.025
 
-    # clipPath def
-    defs_list.append(f"""
-    <clipPath id="{clip_id}">
-      <rect x="{x}" y="{y - 16}" height="22" width="0">
-        <animate attributeName="width"
-          values="0;0;{full_w}"
-          keyTimes="{p0};{p_s};{p_e}"
-          dur="{LOOP}s" repeatCount="indefinite" calcMode="linear"/>
-      </rect>
-    </clipPath>""")
+    cmd3_svg, t = cmd_line(520, " echo 'Thanks for visiting my profile!'",   t, 0.002)
+    t += 0.015
+    o1, t = line_svg('<tspan class="green">Thanks for visiting my profile!</tspan>', t)
+    t += 0.025
+    cursor_t = round(t, 4)
 
-    # build tspans
-    tspans = ""
-    for txt, cls in parts:
-        safe = txt.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
-        if cls.startswith("#"):
-            tspans += f'<tspan fill="{cls}">{safe}</tspan>'
-        else:
-            tspans += f'<tspan class="{cls}">{safe}</tspan>'
-
-    filter_str = 'filter="url(#glow)"' if glow else ""
-
-    elements_list.append(f"""
-  <g opacity="0">
-    <animate attributeName="opacity"
-      values="0;0;1;1;0;0"
-      keyTimes="{p0};{p_s};{p_s + 0.0005};{p_fo};{p_fo + 0.001};{p1}"
-      dur="{LOOP}s" repeatCount="indefinite"/>
-    <text x="{x}" y="{y}" class="text" clip-path="url(#{clip_id})" {filter_str}>{tspans}</text>
-  </g>""")
-
-    return t_end
-
-# ── Define all lines ──────────────────────────────────────────
-X = 24
-t = 0.1
-
-# Boot
-t = add_line(X, 48,  [("Initializing terminal...", "#4A4A4A")], t, cps=80)
-t = add_line(X, 68,  [("[  OK  ] ", "green"), ("Session started · ", "#555"), ("hlcbabuyo", "cyan")], t + 0.1, cps=80)
-t = add_line(X, 88,  [("─" * 60, "#2A2A2A")], t + 0.05, cps=300)
-
-t += 0.35
-
-# Command 1
-t = add_line(X, 126, [
-    ("hlcbabuyo", "prompt"), ("@github", "prompt"),
-    (":", "#333"), ("~", "blue"), ("$ ", "#555"),
-    ("github-stats --user hlcbabuyo", "#CCCCCC")
-], t, cps=42)
-
-t += 0.25
-
-# Stats
-t = add_line(X, 162, [("=== GitHub Stats for hlcbabuyo ===", "cyan")], t, cps=90, glow=True)
-t = add_line(X, 182, [("  Name      ", "orange"), (f"Harvie Lorenz C. Babuyo", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 202, [("  Role      ", "orange"), ("Backend Systems Engineer", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 222, [("  Location  ", "orange"), ("Tagoloan, Misamis Oriental, PH", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 242, [("  Goal      ", "orange"), ("240-Hour OJT  (June 2026)", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 262, [("  Repos     ", "orange"), (str(repos), "green")], t + 0.04, cps=90)
-t = add_line(X, 282, [("  Followers ", "orange"), (str(followers), "green")], t + 0.04, cps=90)
-t = add_line(X, 302, [("=" * 34, "cyan")], t + 0.08, cps=300, glow=True)
-
-t += 0.4
-
-# Command 2
-t = add_line(X, 340, [
-    ("hlcbabuyo", "prompt"), ("@github", "prompt"),
-    (":", "#333"), ("~", "blue"), ("$ ", "#555"),
-    ("cat skills.txt", "#CCCCCC")
-], t, cps=42)
-
-t += 0.25
-
-# Skills
-t = add_line(X, 376, [("=== Tech Stack ===", "cyan")], t, cps=90, glow=True)
-t = add_line(X, 396, [("  Backend   ", "blue"), ("Python · FastAPI · SQLAlchemy · Pydantic", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 416, [("  Database  ", "blue"), ("PostgreSQL · PostGIS · Redis", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 436, [("  Cloud     ", "blue"), ("AWS  S3 · EC2 · RDS · IAM", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 456, [("  DevOps    ", "blue"), ("Docker · Git · GitHub Actions", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 476, [("  Tools     ", "blue"), ("Celery · ReportLab · QRCode · boto3", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 496, [("  Languages ", "blue"), ("Python · SQL", "#CCCCCC")], t + 0.04, cps=90)
-t = add_line(X, 516, [("=" * 18, "cyan")], t + 0.08, cps=300, glow=True)
-
-t += 0.4
-
-# Command 3
-t = add_line(X, 554, [
-    ("hlcbabuyo", "prompt"), ("@github", "prompt"),
-    (":", "#333"), ("~", "blue"), ("$ ", "#555"),
-    ('echo "Thanks for visiting my profile!"', "#CCCCCC")
-], t, cps=42)
-t = add_line(X, 574, [("Thanks for visiting my profile!", "green")], t + 0.1, cps=80, glow=True)
-
-t += 0.3
-
-# Final blinking cursor
-p_s  = pct(t)
-p_fo = pct(FADE_OUT)
-p1   = pct(LOOP)
-final_cursor = f"""
-  <g opacity="0">
-    <animate attributeName="opacity"
-      values="0;0;1;1;0;0"
-      keyTimes="0;{p_s};{p_s + 0.0005};{p_fo};{p_fo + 0.001};{p1}"
-      dur="{LOOP}s" repeatCount="indefinite"/>
-    <text x="{X}" y="612" class="text">
-      <tspan class="prompt">hlcbabuyo</tspan><tspan class="prompt">@github</tspan><tspan fill="#333">:</tspan><tspan class="blue">~</tspan><tspan fill="#555">$ </tspan><tspan fill="#4EC9D4"><animate attributeName="opacity" values="1;0;1" keyTimes="0;0.5;1" dur="1.1s" repeatCount="indefinite"/>█</tspan>
-    </text>
-  </g>"""
-
-# ── Assemble SVG ─────────────────────────────────────────────
-all_defs  = "\n".join(defs_list)
-all_elems = "\n".join(elements_list)
-
-svg_content = f"""<svg width="800" height="640" viewBox="0 0 800 640" xmlns="http://www.w3.org/2000/svg">
+    svg = f"""<svg width="100%" height="680" viewBox="0 0 800 680" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    {all_defs}
-
-    <!-- Scanline pattern -->
-    <pattern id="scanlines" width="800" height="3" patternUnits="userSpaceOnUse">
-      <rect width="800" height="1" y="2" fill="rgba(0,0,0,0.13)"/>
-    </pattern>
-
-    <!-- Vignette -->
-    <radialGradient id="vignette" cx="50%" cy="50%" r="72%">
-      <stop offset="55%" stop-color="transparent"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.55)"/>
-    </radialGradient>
-
-    <!-- Glow filter for headers -->
-    <filter id="glow" x="-15%" y="-40%" width="130%" height="180%">
-      <feGaussianBlur stdDeviation="2.2" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
-
   <style>
-    .text   {{ font-family: 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace; font-size: 14px; fill: #CCCCCC; }}
+    .bg {{ fill: #0A0A0A; }}
+    .text {{ font-family: Consolas, 'Courier New', monospace; font-size: 14px; fill: #CCCCCC; filter: url(#glow); }}
     .prompt {{ fill: #E06C75; }}
-    .cyan   {{ fill: #4EC9D4; }}
-    .green  {{ fill: #89D185; }}
-    .orange {{ fill: #CE9178; }}
-    .blue   {{ fill: #569CD6; }}
+    .cyan {{ fill: #56B6C2; }}
+    .green {{ fill: #98C379; }}
+    .orange {{ fill: #D19A66; }}
+    .blue {{ fill: #61AFEF; }}
   </style>
 
-  <!-- Background -->
-  <rect width="800" height="640" fill="#0D0D0D"/>
+  <rect width="100%" height="100%" class="bg"/>
+  <g transform="translate(20, 30)">
 
-  <!-- Terminal lines -->
-  {all_elems}
-  {final_cursor}
+    <text x="0" y="0"   class="text" opacity="0">Initializing terminal...{boot1_anim}</text>
+    <text x="0" y="20"  class="text" opacity="0"><tspan class="green">[OK]</tspan> System ready{boot2_anim}</text>
 
-  <!-- CRT scanlines overlay -->
-  <rect width="800" height="640" fill="url(#scanlines)" opacity="0.35" pointer-events="none"/>
-  <!-- Vignette overlay -->
-  <rect width="800" height="640" fill="url(#vignette)" pointer-events="none"/>
+    {cmd1_svg}
+    <text x="0" y="100" class="text" opacity="0">{s0}</text>
+    <text x="0" y="120" class="text" opacity="0">{s1}</text>
+    <text x="0" y="140" class="text" opacity="0">{s2}</text>
+    <text x="0" y="160" class="text" opacity="0">{s3}</text>
+    <text x="0" y="180" class="text" opacity="0">{s4}</text>
+    <text x="0" y="200" class="text" opacity="0">{s5}</text>
+    <text x="0" y="220" class="text" opacity="0">{s6}</text>
+    <text x="0" y="240" class="text" opacity="0">{s7}</text>
+
+    {cmd2_svg}
+    <text x="0" y="320" class="text" opacity="0">{k0}</text>
+    <text x="0" y="340" class="text" opacity="0">{k1}</text>
+    <text x="0" y="360" class="text" opacity="0">{k2}</text>
+    <text x="0" y="380" class="text" opacity="0">{k3}</text>
+    <text x="0" y="400" class="text" opacity="0">{k4}</text>
+    <text x="0" y="420" class="text" opacity="0">{k5}</text>
+    <text x="0" y="440" class="text" opacity="0">{k6}</text>
+    <text x="0" y="460" class="text" opacity="0">{k7}</text>
+    <text x="0" y="480" class="text" opacity="0">{k8}</text>
+
+    {cmd3_svg}
+    <text x="0" y="540" class="text" opacity="0">{o1}</text>
+
+    <text x="0" y="580" class="text" opacity="0">
+      <tspan class="prompt">hlcbabuyo@github ~&gt;</tspan> <tspan fill="#CCCCCC"><animate attributeName="opacity" values="1;0" keyTimes="0;0.5" dur="1s" repeatCount="indefinite"/>█</tspan>
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{cursor_t};{cursor_t+0.001};0.95;0.951;1" dur="{DUR}" repeatCount="indefinite"/>
+    </text>
+
+  </g>
 </svg>"""
 
-with open("terminal.svg", "w", encoding="utf-8") as f:
-    f.write(svg_content)
+    with open(output, "w", encoding="utf-8") as f:
+        f.write(svg)
+    print(f"Generated: {output}  (repos={repos}, followers={followers})")
 
-print(f"Done! ({t:.1f}s of content in a {LOOP}s loop)")
+if __name__ == "__main__":
+    generate()
