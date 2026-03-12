@@ -15,7 +15,9 @@ def fetch_github_stats(username):
         print(f"Could not fetch GitHub stats: {e}")
         return {'repos': 'N/A', 'followers': 'N/A'}
 
+
 DUR = "32s"
+
 
 def char_by_char(cmd_text, start_pct, char_delay=0.002):
     spans = []
@@ -29,6 +31,7 @@ def char_by_char(cmd_text, start_pct, char_delay=0.002):
         t += char_delay
     return spans, round(t, 4)
 
+
 def cmd_line(y, cmd_text, start_pct, char_delay=0.002):
     spans, end_pct = char_by_char(cmd_text, start_pct, char_delay)
     prompt_anim = (f'<animate attributeName="opacity" values="0;0;1;1;0;0" '
@@ -40,6 +43,7 @@ def cmd_line(y, cmd_text, start_pct, char_delay=0.002):
            f'{prompt_anim}</text>')
     return svg, end_pct
 
+
 def line_svg(content, start_pct):
     s = round(start_pct, 4)
     anim = (f'<animate attributeName="opacity" values="0;0;1;1;0;0" '
@@ -47,18 +51,20 @@ def line_svg(content, start_pct):
             f'dur="{DUR}" repeatCount="indefinite"/>')
     return f'{content}{anim}', round(s + 0.02, 4)
 
+
 def generate(username="hlcbabuyo", output="terminal.svg"):
     stats = fetch_github_stats(username)
     repos = stats['repos']
     followers = stats['followers']
 
+    # ── Chain all timing ──────────────────────────────────────────────────────
     t = 0.02
     boot1_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{t};{t+0.001};0.95;0.951;1" dur="{DUR}" repeatCount="indefinite"/>'
     t = 0.05
     boot2_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{t};{t+0.001};0.95;0.951;1" dur="{DUR}" repeatCount="indefinite"/>'
     t = 0.09
 
-    cmd1_svg, t = cmd_line(60,  " github-stats --user hlcbabuyo",           t, 0.002)
+    cmd1_svg, t = cmd_line(60,  " github-stats --user hlcbabuyo", t, 0.002)
     t += 0.015
     s0, t = line_svg('<tspan class="cyan">=== GitHub Stats for hlcbabuyo ===</tspan>', t)
     s1, t = line_svg(f'<tspan class="orange">Name:</tspan>        Harvie Lorenz C. Babuyo', t)
@@ -70,9 +76,9 @@ def generate(username="hlcbabuyo", output="terminal.svg"):
     s7, t = line_svg('<tspan class="cyan">==================================</tspan>', t)
     t += 0.025
 
-    cmd2_svg, t = cmd_line(280, " cat skills.txt",                           t, 0.002)
+    cmd2_svg, t = cmd_line(280, " cat skills.txt", t, 0.002)
     t += 0.015
-    k0, t = line_svg('<tspan class="cyan">======== Technical=Stacks ========</tspan>', t)
+    k0, t = line_svg('<tspan class="cyan">=== Tech Stack ===</tspan>', t)
     k1, t = line_svg('<tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic', t)
     k2, t = line_svg('<tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis', t)
     k3, t = line_svg('<tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM)', t)
@@ -80,16 +86,18 @@ def generate(username="hlcbabuyo", output="terminal.svg"):
     k5, t = line_svg('<tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup', t)
     k6, t = line_svg('<tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman', t)
     k7, t = line_svg('<tspan class="blue">Languages:</tspan>   Python, SQL', t)
-    k8, t = line_svg('<tspan class="cyan">==================================</tspan>', t)
+    k8, t = line_svg('<tspan class="cyan">==================</tspan>', t)
     t += 0.025
 
-    cmd3_svg, t = cmd_line(520, " echo 'Thanks for visiting my profile!'",   t, 0.002)
+    cmd3_svg, t = cmd_line(520, " echo 'Thanks for visiting my profile!'", t, 0.002)
     t += 0.015
     o1, t = line_svg('<tspan class="green">Thanks for visiting my profile!</tspan>', t)
     t += 0.025
     cursor_t = round(t, 4)
 
-    svg = f"""<svg width="100%" height="580" viewBox="0 0 800 680" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    print(f"Total time used: {cursor_t} / 0.95  ({'OK' if cursor_t < 0.95 else 'OVERFLOW'})")
+
+    svg = f"""<svg width="100%" height="630" viewBox="0 0 800 630" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="2.5" result="blur" />
@@ -147,6 +155,7 @@ def generate(username="hlcbabuyo", output="terminal.svg"):
     with open(output, "w", encoding="utf-8") as f:
         f.write(svg)
     print(f"Generated: {output}  (repos={repos}, followers={followers})")
+
 
 if __name__ == "__main__":
     generate()
