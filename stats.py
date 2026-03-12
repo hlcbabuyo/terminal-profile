@@ -97,7 +97,7 @@ def generate(username="hlcbabuyo", output="terminal.svg"):
 
     print(f"Total time used: {cursor_t} / 0.95  ({'OK' if cursor_t < 0.95 else 'OVERFLOW'})")
 
-    svg = f"""<svg width="100%" height="630" viewBox="0 0 800 630" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    svg = f"""<svg width="800" viewBox="0 0 800 625" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="2.5" result="blur" />
