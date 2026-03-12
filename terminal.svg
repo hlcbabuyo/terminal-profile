@@ -1,55 +1,94 @@
-<svg width="100%" height="620" viewBox="0 0 800 620" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+<svg width="850" height="620" viewBox="0 0 850 620" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Retro Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
   <style>
-    .bg { fill: #0A0A0A; }
-    .text { font-family: Consolas, 'Courier New', monospace; font-size: 15px; fill: #CCCCCC; }
-    .prompt { fill: #E06C75; }
-    .cyan { fill: #56B6C2; }
-    .green { fill: #98C379; }
-    .orange { fill: #D19A66; }
-    .blue { fill: #61AFEF; }
+    .bg { fill: #050505; }
+    .text { 
+        font-family: Consolas, 'Courier New', monospace; 
+        font-size: 16px; 
+        fill: #D0D0D0; 
+        filter: url(#glow); 
+    }
+    .prompt { fill: #FF5C5C; font-weight: bold; }
+    .cyan { fill: #70FFFF; }
+    .green { fill: #5CFF5C; }
+    .orange { fill: #FFB86C; }
+    .blue { fill: #6272A4; }
+    .blink { animation: blinker 1s step-end infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
   </style>
 
-  <!-- Clean Black Terminal Background -->
+  <!-- Solid Black Background -->
   <rect width="100%" height="100%" class="bg"/>
 
-  <!-- Terminal Content -->
-  <g transform="translate(20, 30)">
-    
-    <!-- Boot Sequence -->
-    <text x="0" y="0" class="text" opacity="0">Initializing terminal...<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.02;0.021;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="20" class="text" opacity="0"><tspan class="green">[OK]</tspan> System ready<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.06;0.061;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
+  <g transform="translate(30, 40)">
+    <!-- Boot -->
+    <text x="0" y="0" class="text" opacity="0">Initializing HLC-OS...<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.01;0.011;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="25" class="text" opacity="0"><tspan class="green">[READY]</tspan> System established.<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.05;0.051000000000000004;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
 
-    <!-- Command 1: GitHub Stats -->
-    <text x="0" y="60" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; github-stats --user hlcbabuyo<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.12;0.121;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    
-    <text x="0" y="100" class="text cyan" opacity="0">=== GitHub Stats for hlcbabuyo ===<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.16;0.161;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="120" class="text" opacity="0"><tspan class="orange">Name:</tspan>        Harvie Lorenz C. Babuyo<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.19;0.191;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="140" class="text" opacity="0"><tspan class="orange">Role:</tspan>        Backend Systems Engineer<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.22;0.221;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="160" class="text" opacity="0"><tspan class="orange">Location:</tspan>    Tagoloan, Misamis Oriental, Philippines<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.25;0.251;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="180" class="text" opacity="0"><tspan class="orange">Goal:</tspan>        240-Hour OJT (June 2026)<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.28;0.281;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="200" class="text" opacity="0"><tspan class="orange">Repos:</tspan>       4<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.31;0.311;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="220" class="text" opacity="0"><tspan class="orange">Followers:</tspan>   11<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.34;0.341;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="240" class="text cyan" opacity="0">==================================<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.37;0.371;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
+    <!-- Command 1: Typing github-stats -->
+    <g opacity="0">
+        { "get_typing_anim('github-stats --user hlcbabuyo')[0]" }
+        <text x="0" y="70" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; github-stats --user hlcbabuyo</text>
+        <rect x="185" y="52" width="400" height="22" class="bg">
+            { "get_typing_anim('github-stats --user hlcbabuyo')[1]" }
+        </rect>
+        <text x="185" y="70" class="text">█
+            { "get_typing_anim('github-stats --user hlcbabuyo')[2]" }
+            { "get_typing_anim('github-stats --user hlcbabuyo')[3]" }
+        </text>
+    </g>
 
-    <!-- Command 2: Tech Stack -->
-    <text x="0" y="280" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; cat skills.txt<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.43;0.431;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    
-    <text x="0" y="320" class="text cyan" opacity="0">=== Tech Stack ===<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.47;0.471;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="340" class="text" opacity="0"><tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.5;0.501;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="360" class="text" opacity="0"><tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.53;0.531;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="380" class="text" opacity="0"><tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM)<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.56;0.561;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="400" class="text" opacity="0"><tspan class="blue">DevOps:</tspan>      Docker, Git, GitHub Actions<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.59;0.591;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="420" class="text" opacity="0"><tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.62;0.621;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="440" class="text" opacity="0"><tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.65;0.651;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="460" class="text" opacity="0"><tspan class="blue">Languages:</tspan>   Python, SQL<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.68;0.681;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="480" class="text cyan" opacity="0">==================<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.71;0.711;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
+    <!-- Stats Output -->
+    <text x="0" y="110" class="text cyan" opacity="0">=== GITHUB ANALYTICS ===<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.11;0.111;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="135" class="text" opacity="0"><tspan class="orange">NAME:</tspan>       Harvie Lorenz C. Babuyo<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.13;0.131;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="160" class="text" opacity="0"><tspan class="orange">ROLE:</tspan>       Backend Systems Engineer<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.15;0.151;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="185" class="text" opacity="0"><tspan class="orange">LOC:</tspan>        Tagoloan, Philippines<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.17;0.171;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="210" class="text" opacity="0"><tspan class="orange">REPOS:</tspan>      4<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.19;0.191;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="235" class="text" opacity="0"><tspan class="orange">FOLLOWERS:</tspan>  11<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.21;0.211;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
 
-    <!-- Command 3: The Outro -->
-    <text x="0" y="520" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; echo 'Thanks for visiting my profile!'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.77;0.771;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    <text x="0" y="540" class="text green" opacity="0">Thanks for visiting my profile!<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.81;0.811;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
+    <!-- Command 2: Typing cat skills.txt -->
+    <g opacity="0">
+        { "get_typing_anim('cat skills.txt')[0]" }
+        <text x="0" y="285" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; cat skills.txt</text>
+        <rect x="185" y="267" width="200" height="22" class="bg">
+            { "get_typing_anim('cat skills.txt')[1]" }
+        </rect>
+        <text x="185" y="285" class="text">█
+            { "get_typing_anim('cat skills.txt')[2]" }
+            { "get_typing_anim('cat skills.txt')[3]" }
+        </text>
+    </g>
 
-    <!-- Final Prompt with Blinking Cursor -->
-    <text x="0" y="580" class="text" opacity="0"><tspan class="prompt">hlcbabuyo@github</tspan> ~&gt; <tspan fill="#CCCCCC"><animate attributeName="opacity" values="1;0" keyTimes="0;0.5" dur="1s" repeatCount="indefinite" />█</tspan><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.87;0.871;0.95;0.951;1" dur="20s" repeatCount="indefinite" /></text>
-    
+    <!-- Skills Output -->
+    <text x="0" y="325" class="text cyan" opacity="0">=== TECH STACK ===<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.29;0.291;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="350" class="text" opacity="0"><tspan class="blue">BACKEND</tspan>     Python, FastAPI, SQLAlchemy<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.31;0.311;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="375" class="text" opacity="0"><tspan class="blue">DATABASE</tspan>    PostgreSQL, PostGIS, Redis<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.33;0.331;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="400" class="text" opacity="0"><tspan class="blue">CLOUD</tspan>       AWS (S3, EC2, RDS, IAM)<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.35;0.351;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="425" class="text" opacity="0"><tspan class="blue">DEVOPS</tspan>      Docker, Git, GitHub Actions<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.37;0.371;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="450" class="text" opacity="0"><tspan class="blue">PROCESSING</tspan>  Celery, BeautifulSoup<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.39;0.391;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+    <text x="0" y="475" class="text cyan" opacity="0">==================<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.41;0.411;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+
+    <!-- Outro -->
+    <g opacity="0">
+        { "get_typing_anim('echo Logout...')[0]" }
+        <text x="0" y="525" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; echo Logout...</text>
+        <rect x="185" y="507" width="200" height="22" class="bg">
+            { "get_typing_anim('echo Logout...')[1]" }
+        </rect>
+    </g>
+    <text x="0" y="555" class="text green" opacity="0">Session terminated. Thanks for visiting!<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.49;0.491;0.95;0.951;1" dur="24s" repeatCount="indefinite" /></text>
+
+    <!-- Final Idle Cursor -->
+    <g opacity="0">
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.5300000000000001;0.5310000000000001;0.95;0.951;1" dur="24s" repeatCount="indefinite" />
+        <text x="0" y="595" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; <tspan class="blink">█</tspan></text>
+    </g>
   </g>
 </svg>
