@@ -72,7 +72,7 @@ def generate(username="hlcbabuyo", output="terminal.svg"):
 
     cmd2_svg, t = cmd_line(280, " cat skills.txt",                           t, 0.002)
     t += 0.015
-    k0, t = line_svg('<tspan class="cyan">=== Tech Stack ===</tspan>', t)
+    k0, t = line_svg('<tspan class="cyan">======== Technical=Stacks ========</tspan>', t)
     k1, t = line_svg('<tspan class="blue">Backend:</tspan>     Python, FastAPI, SQLAlchemy, Pydantic', t)
     k2, t = line_svg('<tspan class="blue">Database:</tspan>    PostgreSQL, PostGIS, Redis', t)
     k3, t = line_svg('<tspan class="blue">Cloud:</tspan>       AWS (S3, EC2, RDS, IAM)', t)
@@ -80,7 +80,7 @@ def generate(username="hlcbabuyo", output="terminal.svg"):
     k5, t = line_svg('<tspan class="blue">Processing:</tspan>  Celery, BeautifulSoup', t)
     k6, t = line_svg('<tspan class="blue">Tools:</tspan>       ReportLab, QRCode, boto3, Postman', t)
     k7, t = line_svg('<tspan class="blue">Languages:</tspan>   Python, SQL', t)
-    k8, t = line_svg('<tspan class="cyan">==================</tspan>', t)
+    k8, t = line_svg('<tspan class="cyan">==================================</tspan>', t)
     t += 0.025
 
     cmd3_svg, t = cmd_line(520, " echo 'Thanks for visiting my profile!'",   t, 0.002)
@@ -89,7 +89,7 @@ def generate(username="hlcbabuyo", output="terminal.svg"):
     t += 0.025
     cursor_t = round(t, 4)
 
-    svg = f"""<svg width="100%" height="680" viewBox="0 0 800 680" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    svg = f"""<svg width="100%" height="580" viewBox="0 0 800 680" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="2.5" result="blur" />
