@@ -8,9 +8,7 @@
 
 ## 🚀 Overview
 
-This repository contains the source code that generates the dynamic, animated terminal SVG displayed on my GitHub profile. 
-
-Instead of relying on third-party stat cards, I built a custom Python script that interfaces with the GitHub API to fetch live metrics and injects them directly into a raw SVG file. The result is a lightweight, zero-dependency, fully animated "hacker terminal" aesthetic complete with a spinning 3D Orbital Data Core.
+This repository contains the source code that generates the dynamic, animated terminal SVG displayed on my GitHub profile. Instead of relying on third-party stat cards, I built a custom Python script that interfaces with the GitHub API to fetch live metrics and injects them directly into a raw SVG file. 
 
 ## ✨ Features
 
