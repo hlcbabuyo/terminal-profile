@@ -4,161 +4,215 @@ import json
 # 1. Fetch live GitHub stats
 try:
     url = "https://api.github.com/users/hlcbabuyo"
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    req = urllib.request.Request(url)
     with urllib.request.urlopen(req) as response:
         data = json.loads(response.read().decode())
         repos = data.get('public_repos', 0)
         followers = data.get('followers', 0)
 except Exception:
-    repos = "5"
-    followers = "11"
+    repos = "N/A"
+    followers = "N/A"
 
-# 2. Timing & Animation Config
-dur = "24s"
-current_pct = 0.01
+# 2. Timing system
+LOOP = 20.0
+FADE_OUT = 19.0
 
-def get_anim(delay=0.02):
-    """Line-by-line popup animation for output lines."""
-    global current_pct
-    start = round(current_pct, 3)
-    current_pct += delay
-    # Visible from 'start' to 95%, then disappears for loop reset
-    return f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{start};{start+0.001};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
+def pct(t):
+    return round(t / LOOP, 4)
 
-def get_typing_anim(text, x_offset=185, type_speed=0.004):
-    """Creates a character-by-character typing reveal with a moving cursor."""
-    global current_pct
-    start = round(current_pct, 3)
-    text_len = len(text)
-    type_end = round(start + (text_len * type_speed), 3)
-    current_pct = type_end + 0.02
-    
-    char_w = 9.1 # Approximate width of Consolas characters
-    cursor_start = x_offset
-    cursor_end = x_offset + (text_len * char_w)
+def type_dur(text, cps=55):
+    return max(0.3, len(text) / cps)
 
-    # 1. Reveal the text line
-    t_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{start};{start+0.001};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
-    # 2. Move the black "mask" rectangle to reveal characters
-    m_anim = f'<animate attributeName="width" values="{text_len*char_w};{text_len*char_w};0;0;{text_len*char_w};{text_len*char_w}" keyTimes="0;{start};{type_end};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
-    # 3. Move the typing cursor
-    c_anim = f'<animate attributeName="x" values="{cursor_start};{cursor_start};{cursor_end};{cursor_end};{cursor_start};{cursor_start}" keyTimes="0;{start};{type_end};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />'
-    # 4. Hide the cursor when not typing
-    co_anim = f'<animate attributeName="opacity" values="0;0;1;1;0;0;0" keyTimes="0;{start};{start+0.001};{type_end};{type_end+0.001};0.95;1" dur="{dur}" repeatCount="indefinite" />'
-    
-    return t_anim, m_anim, c_anim, co_anim
+# 3. Line builder with typing effect (clipPath reveal)
+uid_counter = [0]
+defs_list = []
+elements_list = []
 
-# 3. Build the Masterpiece SVG
-svg_content = f"""<svg width="850" height="620" viewBox="0 0 850 620" xmlns="http://www.w3.org/2000/svg">
+def add_line(x, y, parts, t_start, cps=70, glow=False):
+    """
+    parts = list of (text, color_hex_or_css_class)
+    Returns t_end so you can chain calls.
+    """
+    full_text = "".join(p[0] for p in parts)
+    dur = type_dur(full_text, cps)
+    t_end = t_start + dur
+
+    uid_counter[0] += 1
+    uid = uid_counter[0]
+    clip_id = f"c{uid}"
+
+    p0     = pct(0)
+    p_s    = pct(t_start)
+    p_e    = pct(t_end)
+    p_fo   = pct(FADE_OUT)
+    p1     = pct(LOOP)
+
+    char_w = 8.6
+    full_w = len(full_text) * char_w + 20
+
+    # clipPath def
+    defs_list.append(f"""
+    <clipPath id="{clip_id}">
+      <rect x="{x}" y="{y - 16}" height="22" width="0">
+        <animate attributeName="width"
+          values="0;0;{full_w}"
+          keyTimes="{p0};{p_s};{p_e}"
+          dur="{LOOP}s" repeatCount="indefinite" calcMode="linear"/>
+      </rect>
+    </clipPath>""")
+
+    # build tspans
+    tspans = ""
+    for txt, cls in parts:
+        safe = txt.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+        if cls.startswith("#"):
+            tspans += f'<tspan fill="{cls}">{safe}</tspan>'
+        else:
+            tspans += f'<tspan class="{cls}">{safe}</tspan>'
+
+    filter_str = 'filter="url(#glow)"' if glow else ""
+
+    elements_list.append(f"""
+  <g opacity="0">
+    <animate attributeName="opacity"
+      values="0;0;1;1;0;0"
+      keyTimes="{p0};{p_s};{p_s + 0.0005};{p_fo};{p_fo + 0.001};{p1}"
+      dur="{LOOP}s" repeatCount="indefinite"/>
+    <text x="{x}" y="{y}" class="text" clip-path="url(#{clip_id})" {filter_str}>{tspans}</text>
+  </g>""")
+
+    return t_end
+
+# ── Define all lines ──────────────────────────────────────────
+X = 24
+t = 0.1
+
+# Boot
+t = add_line(X, 48,  [("Initializing terminal...", "#4A4A4A")], t, cps=80)
+t = add_line(X, 68,  [("[  OK  ] ", "green"), ("Session started · ", "#555"), ("hlcbabuyo", "cyan")], t + 0.1, cps=80)
+t = add_line(X, 88,  [("─" * 60, "#2A2A2A")], t + 0.05, cps=300)
+
+t += 0.35
+
+# Command 1
+t = add_line(X, 126, [
+    ("hlcbabuyo", "prompt"), ("@github", "prompt"),
+    (":", "#333"), ("~", "blue"), ("$ ", "#555"),
+    ("github-stats --user hlcbabuyo", "#CCCCCC")
+], t, cps=42)
+
+t += 0.25
+
+# Stats
+t = add_line(X, 162, [("=== GitHub Stats for hlcbabuyo ===", "cyan")], t, cps=90, glow=True)
+t = add_line(X, 182, [("  Name      ", "orange"), (f"Harvie Lorenz C. Babuyo", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 202, [("  Role      ", "orange"), ("Backend Systems Engineer", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 222, [("  Location  ", "orange"), ("Tagoloan, Misamis Oriental, PH", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 242, [("  Goal      ", "orange"), ("240-Hour OJT  (June 2026)", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 262, [("  Repos     ", "orange"), (str(repos), "green")], t + 0.04, cps=90)
+t = add_line(X, 282, [("  Followers ", "orange"), (str(followers), "green")], t + 0.04, cps=90)
+t = add_line(X, 302, [("=" * 34, "cyan")], t + 0.08, cps=300, glow=True)
+
+t += 0.4
+
+# Command 2
+t = add_line(X, 340, [
+    ("hlcbabuyo", "prompt"), ("@github", "prompt"),
+    (":", "#333"), ("~", "blue"), ("$ ", "#555"),
+    ("cat skills.txt", "#CCCCCC")
+], t, cps=42)
+
+t += 0.25
+
+# Skills
+t = add_line(X, 376, [("=== Tech Stack ===", "cyan")], t, cps=90, glow=True)
+t = add_line(X, 396, [("  Backend   ", "blue"), ("Python · FastAPI · SQLAlchemy · Pydantic", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 416, [("  Database  ", "blue"), ("PostgreSQL · PostGIS · Redis", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 436, [("  Cloud     ", "blue"), ("AWS  S3 · EC2 · RDS · IAM", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 456, [("  DevOps    ", "blue"), ("Docker · Git · GitHub Actions", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 476, [("  Tools     ", "blue"), ("Celery · ReportLab · QRCode · boto3", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 496, [("  Languages ", "blue"), ("Python · SQL", "#CCCCCC")], t + 0.04, cps=90)
+t = add_line(X, 516, [("=" * 18, "cyan")], t + 0.08, cps=300, glow=True)
+
+t += 0.4
+
+# Command 3
+t = add_line(X, 554, [
+    ("hlcbabuyo", "prompt"), ("@github", "prompt"),
+    (":", "#333"), ("~", "blue"), ("$ ", "#555"),
+    ('echo "Thanks for visiting my profile!"', "#CCCCCC")
+], t, cps=42)
+t = add_line(X, 574, [("Thanks for visiting my profile!", "green")], t + 0.1, cps=80, glow=True)
+
+t += 0.3
+
+# Final blinking cursor
+p_s  = pct(t)
+p_fo = pct(FADE_OUT)
+p1   = pct(LOOP)
+final_cursor = f"""
+  <g opacity="0">
+    <animate attributeName="opacity"
+      values="0;0;1;1;0;0"
+      keyTimes="0;{p_s};{p_s + 0.0005};{p_fo};{p_fo + 0.001};{p1}"
+      dur="{LOOP}s" repeatCount="indefinite"/>
+    <text x="{X}" y="612" class="text">
+      <tspan class="prompt">hlcbabuyo</tspan><tspan class="prompt">@github</tspan><tspan fill="#333">:</tspan><tspan class="blue">~</tspan><tspan fill="#555">$ </tspan><tspan fill="#4EC9D4"><animate attributeName="opacity" values="1;0;1" keyTimes="0;0.5;1" dur="1.1s" repeatCount="indefinite"/>█</tspan>
+    </text>
+  </g>"""
+
+# ── Assemble SVG ─────────────────────────────────────────────
+all_defs  = "\n".join(defs_list)
+all_elems = "\n".join(elements_list)
+
+svg_content = f"""<svg width="800" height="640" viewBox="0 0 800 640" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Retro Glow Filter -->
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="2.5" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    {all_defs}
+
+    <!-- Scanline pattern -->
+    <pattern id="scanlines" width="800" height="3" patternUnits="userSpaceOnUse">
+      <rect width="800" height="1" y="2" fill="rgba(0,0,0,0.13)"/>
+    </pattern>
+
+    <!-- Vignette -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="72%">
+      <stop offset="55%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.55)"/>
+    </radialGradient>
+
+    <!-- Glow filter for headers -->
+    <filter id="glow" x="-15%" y="-40%" width="130%" height="180%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
 
   <style>
-    .bg {{ fill: #050505; }}
-    .text {{ 
-        font-family: Consolas, 'Courier New', monospace; 
-        font-size: 16px; 
-        fill: #D0D0D0; 
-        filter: url(#glow); 
-    }}
-    .prompt {{ fill: #FF5C5C; font-weight: bold; }}
-    .cyan {{ fill: #70FFFF; }}
-    .green {{ fill: #5CFF5C; }}
-    .orange {{ fill: #FFB86C; }}
-    .blue {{ fill: #6272A4; }}
-    .blink {{ animation: blinker 1s step-end infinite; }}
-    @keyframes blinker {{ 50% {{ opacity: 0; }} }}
+    .text   {{ font-family: 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace; font-size: 14px; fill: #CCCCCC; }}
+    .prompt {{ fill: #E06C75; }}
+    .cyan   {{ fill: #4EC9D4; }}
+    .green  {{ fill: #89D185; }}
+    .orange {{ fill: #CE9178; }}
+    .blue   {{ fill: #569CD6; }}
   </style>
 
-  <!-- Solid Black Background -->
-  <rect width="100%" height="100%" class="bg"/>
+  <!-- Background -->
+  <rect width="800" height="640" fill="#0D0D0D"/>
 
-  <g transform="translate(30, 40)">
-    <!-- Boot -->
-    <text x="0" y="0" class="text" opacity="0">Initializing HLC-OS...{get_anim(0.04)}</text>
-    <text x="0" y="25" class="text" opacity="0"><tspan class="green">[READY]</tspan> System established.{get_anim(0.06)}</text>
+  <!-- Terminal lines -->
+  {all_elems}
+  {final_cursor}
 
-    <!-- Command 1: Typing github-stats -->
-    <g opacity="0">
-        {{ "get_typing_anim('github-stats --user hlcbabuyo')[0]" }}
-        <text x="0" y="70" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; github-stats --user hlcbabuyo</text>
-        <rect x="185" y="52" width="400" height="22" class="bg">
-            {{ "get_typing_anim('github-stats --user hlcbabuyo')[1]" }}
-        </rect>
-        <text x="185" y="70" class="text">█
-            {{ "get_typing_anim('github-stats --user hlcbabuyo')[2]" }}
-            {{ "get_typing_anim('github-stats --user hlcbabuyo')[3]" }}
-        </text>
-    </g>
-
-    <!-- Stats Output -->
-    <text x="0" y="110" class="text cyan" opacity="0">=== GITHUB ANALYTICS ==={get_anim()}</text>
-    <text x="0" y="135" class="text" opacity="0"><tspan class="orange">NAME:</tspan>       Harvie Lorenz C. Babuyo{get_anim()}</text>
-    <text x="0" y="160" class="text" opacity="0"><tspan class="orange">ROLE:</tspan>       Backend Systems Engineer{get_anim()}</text>
-    <text x="0" y="185" class="text" opacity="0"><tspan class="orange">LOC:</tspan>        Tagoloan, Philippines{get_anim()}</text>
-    <text x="0" y="210" class="text" opacity="0"><tspan class="orange">REPOS:</tspan>      {repos}{get_anim()}</text>
-    <text x="0" y="235" class="text" opacity="0"><tspan class="orange">FOLLOWERS:</tspan>  {followers}{get_anim(0.08)}</text>
-
-    <!-- Command 2: Typing cat skills.txt -->
-    <g opacity="0">
-        {{ "get_typing_anim('cat skills.txt')[0]" }}
-        <text x="0" y="285" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; cat skills.txt</text>
-        <rect x="185" y="267" width="200" height="22" class="bg">
-            {{ "get_typing_anim('cat skills.txt')[1]" }}
-        </rect>
-        <text x="185" y="285" class="text">█
-            {{ "get_typing_anim('cat skills.txt')[2]" }}
-            {{ "get_typing_anim('cat skills.txt')[3]" }}
-        </text>
-    </g>
-
-    <!-- Skills Output -->
-    <text x="0" y="325" class="text cyan" opacity="0">=== TECH STACK ==={get_anim()}</text>
-    <text x="0" y="350" class="text" opacity="0"><tspan class="blue">BACKEND</tspan>     Python, FastAPI, SQLAlchemy{get_anim()}</text>
-    <text x="0" y="375" class="text" opacity="0"><tspan class="blue">DATABASE</tspan>    PostgreSQL, PostGIS, Redis{get_anim()}</text>
-    <text x="0" y="400" class="text" opacity="0"><tspan class="blue">CLOUD</tspan>       AWS (S3, EC2, RDS, IAM){get_anim()}</text>
-    <text x="0" y="425" class="text" opacity="0"><tspan class="blue">DEVOPS</tspan>      Docker, Git, GitHub Actions{get_anim()}</text>
-    <text x="0" y="450" class="text" opacity="0"><tspan class="blue">PROCESSING</tspan>  Celery, BeautifulSoup{get_anim()}</text>
-    <text x="0" y="475" class="text cyan" opacity="0">=================={get_anim(0.08)}</text>
-
-    <!-- Outro -->
-    <g opacity="0">
-        {{ "get_typing_anim('echo Logout...')[0]" }}
-        <text x="0" y="525" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; echo Logout...</text>
-        <rect x="185" y="507" width="200" height="22" class="bg">
-            {{ "get_typing_anim('echo Logout...')[1]" }}
-        </rect>
-    </g>
-    <text x="0" y="555" class="text green" opacity="0">Session terminated. Thanks for visiting!{get_anim(0.04)}</text>
-
-    <!-- Final Idle Cursor -->
-    <g opacity="0">
-        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;{current_pct};{current_pct+0.001};0.95;0.951;1" dur="{dur}" repeatCount="indefinite" />
-        <text x="0" y="595" class="text"><tspan class="prompt">hlcbabuyo@server</tspan> ~&gt; <tspan class="blink">█</tspan></text>
-    </g>
-  </g>
+  <!-- CRT scanlines overlay -->
+  <rect width="800" height="640" fill="url(#scanlines)" opacity="0.35" pointer-events="none"/>
+  <!-- Vignette overlay -->
+  <rect width="800" height="640" fill="url(#vignette)" pointer-events="none"/>
 </svg>"""
 
-# Fix curly brace conflict for Python f-strings
-svg_content = svg_content.replace('{{ "get_typing_anim(\'github-stats --user hlcbabuyo\')[0]" }}', get_typing_anim('github-stats --user hlcbabuyo')[0])
-svg_content = svg_content.replace('{{ "get_typing_anim(\'github-stats --user hlcbabuyo\')[1]" }}', get_typing_anim('github-stats --user hlcbabuyo', type_speed=0.004)[1])
-svg_content = svg_content.replace('{{ "get_typing_anim(\'github-stats --user hlcbabuyo\')[2]" }}', get_typing_anim('github-stats --user hlcbabuyo')[2])
-svg_content = svg_content.replace('{{ "get_typing_anim(\'github-stats --user hlcbabuyo\')[3]" }}', get_typing_anim('github-stats --user hlcbabuyo')[3])
+with open("terminal.svg", "w", encoding="utf-8") as f:
+    f.write(svg_content)
 
-svg_content = svg_content.replace('{{ "get_typing_anim(\'cat skills.txt\')[0]" }}', get_typing_anim('cat skills.txt')[0])
-svg_content = svg_content.replace('{{ "get_typing_anim(\'cat skills.txt\')[1]" }}', get_typing_anim('cat skills.txt')[1])
-svg_content = svg_content.replace('{{ "get_typing_anim(\'cat skills.txt\')[2]" }}', get_typing_anim('cat skills.txt')[2])
-svg_content = svg_content.replace('{{ "get_typing_anim(\'cat skills.txt\')[3]" }}', get_typing_anim('cat skills.txt')[3])
-
-svg_content = svg_content.replace('{{ "get_typing_anim(\'echo Logout...\')[0]" }}', get_typing_anim('echo Logout...')[0])
-svg_content = svg_content.replace('{{ "get_typing_anim(\'echo Logout...\')[1]" }}', get_typing_anim('echo Logout...')[1])
-
-with open("terminal.svg", "w", encoding="utf-8") as file:
-    file.write(svg_content)
-
-print("Retro-Glow Animated SVG generated successfully!")
+print(f"Done! ({t:.1f}s of content in a {LOOP}s loop)")
